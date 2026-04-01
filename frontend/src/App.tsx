@@ -14,10 +14,14 @@ function App() {
   const [artist, setArtist] = useState("");
   const [tag, setTag] = useState("");
 
-  useEffect(() => {
+  const fetchSongs = () => {
     fetch("http://localhost:8080/songs")
       .then(res => res.json())
       .then((data: Song[]) => setSongs(data));
+  }
+
+  useEffect(() => {
+    fetchSongs()
   }, [])
 
   const handleSubmit = () => {
@@ -28,6 +32,17 @@ function App() {
       },
       body: JSON.stringify({ title, artist, tag }),
     })
+    .then(res => {
+      if (!res.ok) throw new Error(`API error: ${res.status}`);
+      return res.json();
+    })
+    .then((newSong: Song) => {
+      setSongs([...songs, newSong]);
+      setTitle("");
+      setArtist("");
+      setTag("");
+    })
+    .catch(err => console.error("Failed to add song:", err));
   } 
 
   return (

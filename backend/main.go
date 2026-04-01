@@ -22,7 +22,11 @@ var nextID = 1
 func main() {
 	e := echo.New()
 
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
+		AllowHeaders: []string{echo.HeaderContentType},
+	}))
 
 	e.POST("/songs", postSongHandler)
 	e.GET("/songs", getSongHandler)
