@@ -14,6 +14,8 @@ function App() {
   const [artist, setArtist] = useState("");
   const [tag, setTag] = useState("");
 
+  const [recommendSongs, setRecommendSongs] = useState<Song[]>([])
+
   const fetchSongs = () => {
     fetch("http://localhost:8080/songs")
       .then(res => res.json())
@@ -45,9 +47,15 @@ function App() {
     .catch(err => console.error("Failed to add song:", err));
   } 
 
+  const fetchRecommend = () => {
+    fetch("http://localhost:8080/recommend")
+    .then(res => res.json())
+    .then((data: Song[]) => setRecommendSongs(data));
+  }
+
   return (
     <div>
-      <h1>曲一覧</h1>
+      <h2>曲一覧</h2>
       {songs.map(song => (
         <div key={song.id}>
           {song.title} - {song.artist} ({song.tag})
@@ -76,6 +84,15 @@ function App() {
 
         <button onClick={handleSubmit}>追加</button>
 
+      </div>
+      <div>
+        <h2>おすすめ</h2>
+        <button onClick={fetchRecommend}>おすすめを見る</button>
+          {recommendSongs.map(song => (
+          <div key={song.id}>
+            {song.title} - {song.artist} ({song.tag})
+          </div>
+        ))}
       </div>
     </div>
   )
