@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 type Song struct {
@@ -20,6 +21,8 @@ var nextID = 1
 
 func main() {
 	e := echo.New()
+
+	e.Use(middleware.CORS())
 
 	e.POST("/songs", postSongHandler)
 	e.GET("/songs", getSongHandler)
