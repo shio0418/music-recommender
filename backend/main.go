@@ -106,6 +106,10 @@ func postSongHandler(c echo.Context) error {
 }
 
 func getSongHandler(c echo.Context) error {
+	if songs == nil {
+		return c.JSON(http.StatusOK, []Song{})
+	}
+
 	return c.JSON(http.StatusOK, songs)
 }
 
@@ -118,6 +122,10 @@ func recommendHandler(c echo.Context) error {
 		if s.Tag == targetTag {
 			result = append(result, s)
 		}
+	}
+
+	if result == nil {
+		return c.JSON(http.StatusOK, []Song{})
 	}
 
 	return c.JSON(http.StatusOK, result)
@@ -244,10 +252,18 @@ func parseCount(raw string) int64 {
 }
 
 func calculateScore(viewCount, likeCount, commentCount int64) float64 {
-	viewPart := math.Log1p(float64(viewCount)) * 1.0
-	likePart := math.Log1p(float64(likeCount)) * 2.0
-	commentPart := math.Log1p(float64(commentCount)) * 3.0
-	return viewPart + likePart + commentPart
+	if viewCount <= 0 && likeCount <= 0 && commentCount <= 0 {
+		return 0
+	}
+
+	views := float64(viewCount)
+	likes := float64(likeCount)
+	comments := float64(commentCount)
+
+	engagementRate := (likes + comments*3.0) / (views + 300.0)
+	volumeBonus := math.Log1p(views) * 0.15
+
+	return engagementRate*1000.0 + volumeBonus
 }
 
 func loadEnvFile(path string) error {

@@ -28,7 +28,7 @@ function App() {
   const fetchSongs = () => {
     fetch('http://localhost:8080/songs')
       .then(res => res.json())
-      .then((data: Song[]) => setSongs(data))
+      .then((data: Song[] | null) => setSongs(Array.isArray(data) ? data : []))
       .catch(err => console.error('Failed to fetch songs:', err))
   }
 
@@ -65,7 +65,7 @@ function App() {
   const fetchRecommend = () => {
     fetch('http://localhost:8080/recommend')
       .then(res => res.json())
-      .then((data: Song[]) => setRecommendSongs(data))
+      .then((data: Song[] | null) => setRecommendSongs(Array.isArray(data) ? data : []))
       .catch(err => console.error('Failed to fetch recommendations:', err))
   }
 
