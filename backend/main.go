@@ -22,10 +22,15 @@ var nextID = 1
 func main() {
 	e := echo.New()
 
-	e.Use(middleware.CORS())
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{"*"},
+		AllowMethods: []string{http.MethodGet, http.MethodPost, http.MethodOptions},
+		AllowHeaders: []string{echo.HeaderContentType},
+	}))
 
 	e.POST("/songs", postSongHandler)
 	e.GET("/songs", getSongHandler)
+	e.GET("/recommend", reccomendHandler)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
@@ -56,4 +61,18 @@ func postSongHandler(c echo.Context) error {
 
 func getSongHandler(c echo.Context) error {
 	return c.JSON(http.StatusOK, songs)
+}
+
+func reccomendHandler(c echo.Context) error {
+	targetTag := "夜"
+
+	var result []Song
+
+	for _, s := range songs {
+		if s.Tag == targetTag {
+			result = append(result, s)
+		}
+	}
+
+	return c.JSON(http.StatusOK, result)
 }
